@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>გაზქურის მონიტორინგის სისტემა — საბაკალავრო პროექტი</title>
+<meta name="description" content="არაკონტაქტური თერმული მონიტორინგის სისტემა, რომელიც გაზქურაზე ცეცხლის ანთებასა და უკონტროლო ჩაქრობას აფიქსირებს და საყოფაცხოვრებო ხანძრების პრევენციას ემსახურება. ESP-32S და MLX90640 თერმული კამერა.">
+<meta property="og:title" content="გაზქურის მონიტორინგის სისტემა">
+<meta property="og:description" content="არაკონტაქტური თერმული მონიტორინგის სისტემა საყოფაცხოვრებო ხანძრების პრევენციისთვის.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/gadget-front.jpg">
+<meta name="theme-color" content="#0a0b12">
+<link rel="preload" href="fonts/bpg-rioni-arial-webfont.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ░░ NAV ░░ -->
+<header class="nav" id="nav">
+  <a href="#hero" class="nav__brand">
+    <span class="nav__dot"></span>
+    გაზქურის მონიტორინგი
+  </a>
+  <nav class="nav__links">
+    <a href="#problem">პრობლემა</a>
+    <a href="#how">როგორ მუშაობს</a>
+    <a href="#tech">ტექნოლოგია</a>
+    <a href="#logic">ალგორითმი</a>
+    <a href="#tests">ტესტირება</a>
+    <a href="#device">მოწყობილობა</a>
+    <a href="#team">გუნდი</a>
+  </nav>
+  <button class="nav__burger" id="burger" aria-label="მენიუ">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- ░░ HERO ░░ -->
+<section class="hero" id="hero">
+  <canvas class="hero__thermal" id="thermal"></canvas>
+  <div class="hero__overlay"></div>
+  <div class="hero__inner">
+    <div class="hero__badge">საბაკალავრო დამამთავრებელი პროექტი · CE490B</div>
+    <h1 class="hero__title">გაზქურის<br><span class="grad">მონიტორინგის</span> სისტემა</h1>
+    <p class="hero__lead">
+      არაკონტაქტური, ინტელექტუალური სისტემა, რომელიც თერმული სკანირებით
+      აფიქსირებს გაზქურაზე ცეცხლის უკონტროლო ჩაქრობას —
+      <strong>საფრთხის კრიტიკულ ფაზაში გადასვლამდე.</strong>
+    </p>
+    <div class="hero__cta">
+      <a href="#how" class="btn btn--primary">როგორ მუშაობს</a>
+      <a href="https://github.com/MateMch-iliauni/bachelor-s-thesis" target="_blank" rel="noopener" class="btn btn--ghost">GitHub რეპოზიტორია ↗</a>
+    </div>
+    <div class="hero__stats">
+      <div class="stat"><span class="stat__num" data-count="80" data-suffix="°C">0</span><span class="stat__lbl">ცეცხლის ანთების ზღვარი</span></div>
+      <div class="stat"><span class="stat__num" data-count="768">0</span><span class="stat__lbl">თერმოპიქსელი (32×24)</span></div>
+      <div class="stat"><span class="stat__num" data-count="4" data-suffix=" წმ">0</span><span class="stat__lbl">რეაგირების დრო</span></div>
+      <div class="stat"><span class="stat__num" data-count="44" data-suffix="%">0</span><span class="stat__lbl">ხანძრების მიზეზი — სამზარეულო</span></div>
+    </div>
+  </div>
+  <div class="hero__scroll">გადაახვიე ქვემოთ</div>
+</section>
+
+<!-- ░░ PROBLEM ░░ -->
+<section class="section" id="problem">
+  <div class="container">
+    <div class="section__head">
+      <span class="eyebrow">01 — საჭიროება</span>
+      <h2 class="section__title">პრობლემა, რომელსაც ვაგვარებთ</h2>
+    </div>
+    <div class="problem">
+      <div class="problem__text">
+        <p>
+          სახანძრო უსაფრთხოების საერთაშორისო კვლევების მიხედვით, საკვების
+          მომზადება საცხოვრებელ შენობებში ხანძრების <strong>წამყვანი მიზეზია</strong>.
+          NFPA-ის მონაცემებით, საყოფაცხოვრებო ხანძრების დაახლოებით 44% სწორედ
+          სამზარეულო მოწყობილობებითაა გამოწვეული, ხოლო უყურადღებოდ
+          დატოვებული გაზქურა დასახელებულია ხანძრისა და მსხვერპლის
+          ნომერ პირველ ხელშემწყობ ფაქტორად.
+        </p>
+        <p>
+          არსებული უსაფრთხოების სისტემები — სტანდარტული კვამლის დეტექტორები —
+          <strong>უკვე მომხდარ ფაქტზე რეაგირებენ.</strong> გაზქურაზე ალის ჩაქრობისას
+          კვამლი არ წარმოიქმნება, გამოიყოფა მხოლოდ ბუნებრივი აირი, რომელსაც
+          ჩვეულებრივი დეტექტორი ვერ ხედავს. შესაბამისად, არსებობს მკაფიო
+          საჭიროება ისეთი <strong>პრევენციული</strong> სისტემისა, რომელიც საფრთხეს
+          რეალურ დროში ამოიცნობს.
+        </p>
+      </div>
+      <div class="problem__cards">
+        <div class="bigstat">
+          <div class="bigstat__num grad">44%</div>
+          <div class="bigstat__lbl">საყოფაცხოვრებო ხანძრების მიზეზია სამზარეულო მოწყობილობები <span>— NFPA</span></div>
+        </div>
+        <div class="bigstat">
+          <div class="bigstat__num grad">51%</div>
+          <div class="bigstat__lbl">ცალკეულ კატეგორიაში — საცხოვრებელ შენობებში მომხდარი ხანძრების წილი</div>
+        </div>
+        <div class="bigstat bigstat--full">
+          <div class="bigstat__lbl"><strong>#1</strong> ხელშემწყობი ფაქტორი — უყურადღებოდ დატოვებული გაზქურა</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ HOW IT WORKS ░░ -->
+<section class="section section--alt" id="how">
+  <div class="container">
+    <div class="section__head">
+      <span class="eyebrow">02 — გადაწყვეტა</span>
+      <h2 class="section__title">როგორ მუშაობს</h2>
+      <p class="section__sub">
+        სისტემა არაკონტაქტური თერმული სკანირებით უშუალოდ აკვირდება გაზქურის
+        ზედაპირის ტემპერატურულ სურათს და ამოიცნობს ორ კრიტიკულ მოვლენას.
+      </p>
+    </div>
+
+    <div class="flow">
+      <div class="flow__step">
+        <div class="flow__icon">🔍</div>
+        <h3>თერმული სკანირება</h3>
+        <p>MLX90640 კამერა 32×24 = 768 პიქსელით უწყვეტად ზომავს ქურის მთელი ზედაპირის ტემპერატურას 110° ხედვის კუთხით.</p>
+      </div>
+      <div class="flow__arrow">→</div>
+      <div class="flow__step">
+        <div class="flow__icon">🌡️</div>
+        <h3>ყველაზე ცხელი წერტილი</h3>
+        <p>ალგორითმი 768 პიქსელში პოულობს მაქსიმალურ მნიშვნელობას — ეს არის ცეცხლის ამოცნობის ლოგიკის საფუძველი.</p>
+      </div>
+      <div class="flow__arrow">→</div>
+      <div class="flow__step">
+        <div class="flow__icon">⚖️</div>
+        <h3>ზღვრული ლოგიკა</h3>
+        <p>ანთება ფიქსირდება 80°C-ზე ზევით; ჩაქრობა — 55°C-ზე დაბლა ან ხანგრძლივი გაგრილების ტენდენციით.</p>
+      </div>
+      <div class="flow__arrow">→</div>
+      <div class="flow__step">
+        <div class="flow__icon">🚨</div>
+        <h3>ორდონიანი განგაში</h3>
+        <p>ლოკალური ხმოვანი სიგნალი (85 dB) + მყისიერი Telegram-შეტყობინება დაშიფრული HTTPS არხით.</p>
+      </div>
+    </div>
+
+    <div class="innovation">
+      <div class="innovation__mark">★ ინოვაცია</div>
+      <p>
+        პროექტის ინოვაციური ნაწილია ის, რომ <strong>ცეცხლის უეცარი ჩაქრობა</strong>
+        ამოიცნობა ორი დამოუკიდებელი მეთოდით — ზღვარს ქვემოთ მკვეთრი ვარდნა
+        <em>და</em> თანდათანობითი გაგრილების ტენდენცია. სწორედ ეს მდგომარეობა
+        (აირი მოედინება, ალი კი აღარ არის) რჩება უხილავი ჩვეულებრივი
+        კვამლის დეტექტორისთვის.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ TECH / COMPONENTS ░░ -->
+<section class="section" id="tech">
+  <div class="container">
+    <div class="section__head">
+      <span class="eyebrow">03 — აპარატურა</span>
+      <h2 class="section__title">ტექნოლოგია და კომპონენტები</h2>
+    </div>
+
+    <div class="components">
+      <article class="comp comp--hero">
+        <div class="comp__tag">თერმული კამერა</div>
+        <h3>MLX90640</h3>
+        <p>Melexis-ის შორეული ინფრაწითელი (FIR) 32×24 თერმოპიქსელიანი მასივი, რომელიც ერთდროულად ზომავს მთელი ქურის სითბურ სურათს.</p>
+        <ul class="comp__specs">
+          <li><span>ხედვის კუთხე (FoV)</span><b>110° × 75°</b></li>
+          <li><span>დიაპაზონი</span><b>−40°C … +300°C</b></li>
+          <li><span>სიზუსტე</span><b>±1°C</b></li>
+          <li><span>განახლება</span><b>2 Hz (პროექტში)</b></li>
+          <li><span>ინტერფეისი</span><b>I²C · 0x33</b></li>
+        </ul>
+      </article>
+
+      <article class="comp">
+        <div class="comp__tag">მიკროკონტროლერი</div>
+        <h3>ESP-32S (WROOM)</h3>
+        <p>ორბირთვიანი Xtensa LX6 (240 MHz-მდე) ჩაშენებული Wi-Fi-ით. ერთ ბირთვზე — სენსორის წაკითხვა, მეორეზე — ქსელური კომუნიკაცია.</p>
+        <ul class="comp__specs">
+          <li><span>Wi-Fi</span><b>802.11 b/g/n</b></li>
+          <li><span>ბირთვები</span><b>2 × LX6</b></li>
+          <li><span>OS</span><b>FreeRTOS</b></li>
+        </ul>
+      </article>
+
+      <article class="comp">
+        <div class="comp__tag">ხმოვანი სიგნალი</div>
+        <h3>აქტიური ბაზერი</h3>
+        <p>KY-012 აქტიური ბაზერი ლოკალური გაფრთხილებისთვის — მუშაობისთვის საჭიროებს მხოლოდ მუდმივ ძაბვას.</p>
+        <ul class="comp__specs">
+          <li><span>ხმა</span><b>~85 dB</b></li>
+          <li><span>დენი</span><b>≤ 30 mA</b></li>
+          <li><span>GPIO</span><b>პინი 4</b></li>
+        </ul>
+      </article>
+
+      <article class="comp">
+        <div class="comp__tag">მართვა</div>
+        <h3>ღილაკი</h3>
+        <p>ფიზიკური ტაქტილური ღილაკი მონიტორინგის ჩართვა/გამორთვისთვის, რყევის ჩახშობით (debouncing).</p>
+        <ul class="comp__specs">
+          <li><span>ტიპი</span><b>მომენტალური</b></li>
+          <li><span>ლოგიკა</span><b>Active low</b></li>
+          <li><span>GPIO</span><b>პინი 5</b></li>
+        </ul>
+      </article>
+    </div>
+
+    <!-- BOM -->
+    <div class="bom">
+      <h3 class="bom__title">ღირებულების ანალიზი <span>(BOM)</span></h3>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>კომპონენტი</th><th>რაოდ.</th><th>ფასი / ერთ.</th><th>ჯამი</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>ESP-32S-WROOM</td><td>1</td><td>35.00 ₾</td><td>35.00 ₾</td></tr>
+            <tr><td>Push button module</td><td>1</td><td>3.13 ₾</td><td>3.13 ₾</td></tr>
+            <tr><td>Active buzzer module</td><td>1</td><td>3.85 ₾</td><td>3.85 ₾</td></tr>
+            <tr><td>MLX90640 Thermal Camera</td><td>1</td><td>175.33 ₾</td><td>175.33 ₾</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td colspan="3">სრული ღირებულება</td><td class="grad">217.31 ₾</td></tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="bom__note">~516 mA ჯამური დენი → შერჩეულია 5V / 2A კვების ბლოკი (~26% რეზერვი).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ COMPARISON ░░ -->
+<section class="section section--alt" id="compare">
+  <div class="container">
+    <div class="section__head">
+      <span class="eyebrow">04 — კონცეფციის შერჩევა</span>
+      <h2 class="section__title">რატომ თერმული მატრიცული კამერა</h2>
+      <p class="section__sub">საბოლოო კონცეფცია შევარჩიეთ შეფასების მატრიცის (decision matrix) საფუძველზე — ოთხი მიდგომა, ექვსი კრიტერიუმი (1–5 ქულა).</p>
+    </div>
+    <div class="table-wrap">
+      <table class="table table--matrix">
+        <thead>
+          <tr>
+            <th>კრიტერიუმი</th>
+            <th>წერტილოვანი<br>სენსორი</th>
+            <th>გაზის სენსორი<br>(MQ)</th>
+            <th>ცეცხლის<br>ოპტიკური</th>
+            <th class="win">თერმული<br>კამერა ✓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>არაკონტაქტური გაზომვა</td><td>3</td><td>2</td><td>4</td><td class="win">5</td></tr>
+          <tr><td>სივრცული დაფარვა</td><td>1</td><td>3</td><td>2</td><td class="win">5</td></tr>
+          <tr><td>ცრუ განგაშის დაბალი რისკი</td><td>3</td><td>2</td><td>2</td><td class="win">5</td></tr>
+          <tr><td>რეაგირების სიჩქარე</td><td>4</td><td>2</td><td>5</td><td class="win">4</td></tr>
+          <tr><td>ფასი / ხელმისაწვდომობა</td><td>5</td><td>5</td><td>5</td><td class="win">2</td></tr>
+          <tr><td>ინტეგრაციის სიმარტივე</td><td>4</td><td>4</td><td>4</td><td class="win">3</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>ჯამი</td><td>20</td><td>18</td><td>22</td><td class="win">24</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ LOGIC / STATE MACHINE ░░ -->
+<section class="section" id="logic">
+  <div class="container">
+    <div class="section__head">
+      <span class="eyebrow">05 — ალგორითმი</span>
+      <h2 class="section__title">ამოცნობის ლოგიკა</h2>
+      <p class="section__sub">სისტემა მუშაობს ოთხ მდგომარეობიან მანქანაზე (state machine), FreeRTOS-ის პარალელურ ნაკადებზე.</p>
+    </div>
+
+    <div class="states">
+      <div class="state" data-state="idle">
+        <div class="state__num">01</div>
+        <h3>IDLE</h3>
+        <p>უმოქმედობა. სისტემა ელოდება ღილაკის დაჭერას მონიტორინგის დასაწყებად.</p>
+      </div>
+      <div class="state__link"></div>
+      <div class="state" data-state="mon">
+        <div class="state__num">02</div>
+        <h3>MONITORING</h3>
+        <p>აქტიური სკანირება. როცა მაქს. ტემპერატურა ≥ 80°C — გადადის ცეცხლის რეჟიმში.</p>
+      </div>
+      <div class="state__link"></div>
+      <div class="state" data-state="fire">
+        <div class="state__num">03</div>
+        <h3>FIRE&nbsp;ACTIVE</h3>
+        <p>ცეცხლი დაფიქსირებულია. სისტემა აკვირდება ვარდნას ორი პარალელური მეთოდით.</p>
+      </div>
+      <div class="state__link"></div>
+      <div class="state" data-state="alarm">
+        <div class="state__num">04</div>
+        <h3>ALARM</h3>
+        <p>განგაში: ბაზერი + Telegram, სანამ მომხმარებელი ღილაკს ხელახლა არ დააჭერს.</p>
+      </div>
+    </div>
+
+    <div class="logic-grid">
+      <div class="logic-card">
+        <div class="logic-card__head"><span class="logic-card__badge">მეთოდი 1</span> მკვეთრი ვარდნა</div>
+        <p>თუ ტემპერატურა ჩამოსცდება <b>55°C</b>-ს ზედიზედ <b>8 კადრის</b> (≈4 წმ) განმავლობაში — განგაში. ეფექტურია გაზის სანთურაზე, რომელიც სითბოს არ ინარჩუნებს.</p>
+      </div>
+      <div class="logic-card">
+        <div class="logic-card__head"><span class="logic-card__badge">მეთოდი 2</span> გაგრილების ტენდენცია</div>
+        <p>თუ ტემპერატურა ეცემა <b>≥ 0.2°C/კადრი</b> ზედიზედ <b>10 კადრის</b> (≈5 წმ) განმავლობაში — განგაში. ეფექტურია სქელკედლიანი ჭურჭლისთვის (ქვაბი, ტაფა), რომელიც დიდხანს ინარჩუნებს სითბოს.</p>
+      </div>
+    </div>
+
+    <!-- Pseudocode -->
+    <div class="code">
+      <div class="code__bar">
+        <span class="code__dot"></span><span class="code__dot"></span><span class="code__dot"></span>
+        <span class="code__title">ფსევდოკოდი — FIRE_ACTIVE მდგომარეობა</span>
+      </div>
+<pre class="code__body"><code><span class="c-key">CASE</span> FIRE_ACTIVE:
+  peakTemp    <span class="c-op">←</span> <span class="c-fn">max</span>(peakTemp, maxTemp)
+  delta       <span class="c-op">←</span> maxTemp <span class="c-op">−</span> previousTemp
+
+  <span class="c-com">// მეთოდი 2 — გაგრილების ტენდენცია</span>
+  <span class="c-key">IF</span> delta <span class="c-op">≤</span> <span class="c-num">−0.2°C</span> <span class="c-key">THEN</span> coolingFrames<span class="c-op">++</span>
+  <span class="c-key">ELSE</span> coolingFrames <span class="c-op">←</span> <span class="c-num">0</span>
+  previousTemp <span class="c-op">←</span> maxTemp
+
+  <span class="c-com">// მეთოდი 1 — მკვეთრი ვარდნა ზღვარს ქვემოთ</span>
+  <span class="c-key">IF</span> maxTemp <span class="c-op">&lt;</span> <span class="c-num">55°C</span> <span class="c-key">THEN</span>
+    coldFrameCount<span class="c-op">++</span>
+    <span class="c-key">IF</span> coldFrameCount <span class="c-op">≥</span> <span class="c-num">8</span> <span class="c-key">THEN</span> <span class="c-fn">Raise_Alarm</span>()
+  <span class="c-key">ELSE</span> coldFrameCount <span class="c-op">←</span> <span class="c-num">0</span>
+
+  <span class="c-key">IF</span> coolingFrames <span class="c-op">≥</span> <span class="c-num">10</span> <span class="c-key">THEN</span> <span class="c-fn">Raise_Alarm</span>()</code></pre>
+    </div>
+    <p class="code__note">სრული საწყისი კოდი (C++ / Arduino) ხელმისაწვდომია <a href="https://github.com/MateMch-iliauni/bachelor-s-thesis/blob/main/Project-Codes/finalproject.ino" target="_blank" rel="noopener">GitHub-ზე ↗</a></p>
+  </div>
+</section>
+
+<!-- ░░ TESTS ░░ -->
+<section class="section section--alt" id="tests">
+  <div class="container">
+    <div class="section__head">
+      <span class="eyebrow">06 — ვერიფიკაცია</span>
+      <h2 class="section__title">ტესტირება და შედეგები</h2>
+      <p class="section__sub">პირველ თავში განსაზღვრული ყველა ძირითადი სპეციფიკაცია წარმატებით შესრულდა.</p>
+    </div>
+
+    <div class="tests">
+      <div class="testcard"><div class="testcard__crit">≤ ±2°C</div><h4>ტემპერატურის სიზუსტე</h4><p>გაყინული (~0°C) და მდუღარე (~100°C) წყლის გაზომვა.</p><div class="testcard__res">±1–2°C — ჩაბარდა</div></div>
+      <div class="testcard"><div class="testcard__crit">სტატუსი</div><h4>ცეცხლის ანთება</h4><p>FIRE_ACTIVE-ში გადასვლა 80°C-ის გადაკვეთისას.</p><div class="testcard__res">~1 წმ — ჩაბარდა</div></div>
+      <div class="testcard"><div class="testcard__crit">≤ 6 წმ</div><h4>ალის ჩაქრობა (სანთურა)</h4><p>განგაში ქვედა ზღვრის (&lt;55°C) დაფიქსირებისას.</p><div class="testcard__res">~4 წმ — ჩაბარდა</div></div>
+      <div class="testcard"><div class="testcard__crit">ტენდენცია</div><h4>თანდათანობითი ვარდნა</h4><p>დიდი ქვაბის გაცივების ამოცნობა (≥0.2°C/კადრი).</p><div class="testcard__res">~9 წმ — ჩაბარდა</div></div>
+      <div class="testcard"><div class="testcard__crit">≤ 5 წმ</div><h4>Telegram-შეტყობინება</h4><p>დრო განგაშიდან შეტყობინების მიღებამდე.</p><div class="testcard__res">~2–4 წმ — ჩაბარდა</div></div>
+      <div class="testcard"><div class="testcard__crit">AP რეჟიმი</div><h4>Wi-Fi კონფიგურაცია</h4><p>Access Point, ვებფორმა, პარამეტრების შენახვა.</p><div class="testcard__res">ჩაბარდა</div></div>
+      <div class="testcard"><div class="testcard__crit">1 = 1</div><h4>ღილაკის მუშაობა</h4><p>ყოველი დაჭერა = ერთი გადართვა (debounce).</p><div class="testcard__res">ჩაბარდა</div></div>
+      <div class="testcard"><div class="testcard__crit">110° FoV</div><h4>ხედვის არეალი</h4><p>ყველა სანთურა მოექცა სენსორის ხედვაში.</p><div class="testcard__res">ჩაბარდა</div></div>
+    </div>
+
+    <!-- Scenario chart -->
+    <div class="scenario">
+      <h3 class="scenario__title">სცენარი — ცეცხლის ჩაქრობა გაზქურის სანთურაზე</h3>
+      <p class="scenario__sub">ტემპერატურის ცვლილება ეტაპობრივად: ანთება → მონიტორინგი → ვარდნა → განგაში.</p>
+      <div class="chart" id="chart" aria-hidden="true"></div>
+      <div class="chart__legend">
+        <span><i class="dot dot--fire"></i> ცეცხლის ანთება ≥80°C</span>
+        <span><i class="dot dot--off"></i> ჩაქრობის ზღვარი &lt;55°C</span>
+        <span><i class="dot dot--alarm"></i> განგაში</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ DEVICE / GALLERY ░░ -->
+<section class="section" id="device">
+  <div class="container">
+    <div class="section__head">
+      <span class="eyebrow">07 — პროტოტიპი</span>
+      <h2 class="section__title">მოწყობილობა</h2>
+      <p class="section__sub">კორპუსი დამზადებულია 3D ბეჭდვით (Fusion 360). წინა პანელზე — თერმული კამერა, ზედა პანელზე — ღილაკი და ხმის ღიობი.</p>
+    </div>
+
+    <div class="gallery">
+      <figure class="gallery__item gallery__item--big">
+        <img src="assets/gadget-front.jpg" alt="მოწყობილობა წინა ხედით" loading="lazy">
+        <figcaption>წინა ხედი — თერმული კამერის ფანჯარა</figcaption>
+      </figure>
+      <figure class="gallery__item">
+        <img src="assets/gadget-top.jpg" alt="მოწყობილობა ზედა ხედით" loading="lazy">
+        <figcaption>ზედა ხედი — ღილაკი და ხმის ღიობი</figcaption>
+      </figure>
+      <figure class="gallery__item">
+        <img src="assets/gadget-body.jpg" alt="მოწყობილობის კორპუსი" loading="lazy">
+        <figcaption>კორპუსი — 3D ბეჭდილი (პლასტმასა)</figcaption>
+      </figure>
+    </div>
+
+    <div class="demo">
+      <h3 class="demo__title">ვიდეო დემონსტრაცია</h3>
+      <video class="demo__video" controls preload="none" poster="assets/demo-poster.jpg" playsinline>
+        <source src="assets/demo.mp4" type="video/mp4">
+        თქვენი ბრაუზერი ვერ უჭერს მხარს ვიდეოს.
+      </video>
+    </div>
+
+    <!-- User guide -->
+    <div class="guide">
+      <h3 class="guide__title">პირველადი გაშვება</h3>
+      <ol class="guide__steps">
+        <li>შეაერთეთ მოწყობილობა კვების წყაროსთან.</li>
+        <li>განათავსეთ გაზქურის გვერდით ისე, რომ კამერა ხედავდეს ოთხივე სანთურას.</li>
+        <li>ჩართვისთანავე იქმნება Wi-Fi წერტილი <code>ThermalSystemSetup</code>.</li>
+        <li>დაუკავშირდით ამ ქსელს — ავტომატურად გაიხსნება კონფიგურაციის გვერდი.</li>
+        <li>შეიყვანეთ Wi-Fi მონაცემები და Telegram Chat ID, შეინახეთ.</li>
+        <li>ღილაკზე დაჭერით ჩართეთ მონიტორინგი.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ TEAM / CONCLUSION ░░ -->
+<section class="section section--alt" id="team">
+  <div class="container">
+    <div class="section__head">
+      <span class="eyebrow">08 — გუნდი</span>
+      <h2 class="section__title">გუნდი და დასკვნები</h2>
+    </div>
+
+    <div class="team">
+      <div class="member">
+        <div class="member__avatar">დქ</div>
+        <h3>დათო ქადარია</h3>
+        <p class="member__role">ალგორითმის შემუშავება და ინტეგრაცია</p>
+        <p>თერმული კამერიდან მონაცემების დამუშავება, ცეცხლის ჩაქრობის ამოცნობის ლოგიკა და სისტემის სტაბილიზაცია.</p>
+      </div>
+      <div class="member">
+        <div class="member__avatar">მმ</div>
+        <h3>მათე მჭედლიშვილი</h3>
+        <p class="member__role">დიზაინი, აწყობა და ვებსაიტი</p>
+        <p>3D მოდელის შექმნა, კომპონენტების მონტაჟი და პროექტის ვებგვერდის აწყობა.</p>
+      </div>
+    </div>
+
+    <div class="future">
+      <h3 class="future__title">რეკომენდაციები მომავალი სამუშაოსთვის</h3>
+      <ul class="future__list">
+        <li>ბუნებრივი აირის სარქველის ავტომატური გადაკეტვა საფრთხის აღმოჩენისას</li>
+        <li>სარეზერვო კვება (ბატარეა / UPS)</li>
+        <li>ზღვრების ავტომატური განსაზღვრა მანქანური სწავლებით</li>
+        <li>ცალკეული სანთურების ურთიერთდამოუკიდებელი მონიტორინგი</li>
+        <li>მობილური აპლიკაცია მოწყობილობის სამართავად</li>
+        <li>თბომედეგი მასალით კორპუსის ჩანაცვლება</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ░░ FOOTER ░░ -->
+<footer class="footer">
+  <div class="container footer__inner">
+    <div class="footer__col">
+      <div class="footer__brand"><span class="nav__dot"></span> გაზქურის მონიტორინგის სისტემა</div>
+      <p>ილიას სახელმწიფო უნივერსიტეტი<br>ბიზნესის, ტექნოლოგიისა და განათლების ფაკულტეტი · ტექნოლოგიების სკოლა</p>
+      <p class="footer__meta">კომპიუტერული ინჟინერიის საბაკალავრო პროგრამა · დამამთავრებელი კურსის პროექტი B (CE490B) · 2026</p>
+    </div>
+    <div class="footer__col">
+      <h4>ბმულები</h4>
+      <a href="https://github.com/MateMch-iliauni/bachelor-s-thesis" target="_blank" rel="noopener">GitHub — საბაკალავრო ნაშრომი ↗</a>
+      <a href="https://github.com/MateMch-iliauni/bachelor-s-thesis/tree/main/project-diagrams" target="_blank" rel="noopener">დიაგრამები და სქემები ↗</a>
+      <a href="https://github.com/MateMch-iliauni/Production_drawings" target="_blank" rel="noopener">საწარმოო ნახაზები (3D) ↗</a>
+    </div>
+    <div class="footer__col">
+      <h4>ხელმძღვანელები</h4>
+      <p>პროფ. დავით ჩხაიძე</p>
+      <p>პროფ. გიორგი მოდებაძე</p>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <span>© 2026 დათო ქადარია · მათე მჭედლიშვილი</span>
+    <a href="#hero">ზევით ↑</a>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
