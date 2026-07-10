@@ -15,13 +15,15 @@
   }, { passive: true });
 
   burger.addEventListener('click', function () {
-    burger.classList.toggle('open');
-    links.classList.toggle('open');
+    var isOpen = links.classList.toggle('open');
+    burger.classList.toggle('open', isOpen);
+    burger.setAttribute('aria-expanded', String(isOpen));
   });
   links.addEventListener('click', function (e) {
     if (e.target.tagName === 'A') {
       burger.classList.remove('open');
       links.classList.remove('open');
+      burger.setAttribute('aria-expanded', 'false');
     }
   });
 

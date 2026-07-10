@@ -36,13 +36,20 @@
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;scroll-padding-top:80px}
+html{
+  scroll-behavior:smooth;
+  scroll-padding-top:80px;
+  max-width:100%;
+  overflow-x:hidden; /* fallback for browsers without overflow: clip */
+  overflow-x:clip;
+}
 body{
   font-family:var(--font);
   background:var(--bg);
   color:var(--text);
   line-height:1.7;
   -webkit-font-smoothing:antialiased;
+  max-width:100%;
   overflow-x:hidden;
 }
 body::before{ /* ambient thermal glow */
@@ -362,13 +369,16 @@ img{max-width:100%;display:block}
 /* ============ RESPONSIVE ============ */
 @media(max-width:980px){
   .nav__links{
-    position:fixed;top:0;right:0;bottom:0;width:min(78vw,320px);flex-direction:column;
-    gap:8px;padding:96px 32px;background:var(--bg-2);border-left:1px solid var(--line);
-    transform:translateX(100%);transition:.35s;z-index:48;
+    position:fixed;top:0;right:0;width:min(78vw,320px);height:100vh;height:100dvh;flex-direction:column;
+    gap:8px;padding:96px 32px;
+    background-color:var(--bg-2); /* opaque drawer: never show page content beneath */
+    opacity:1;border-left:1px solid var(--line);
+    box-shadow:-18px 0 36px rgba(0,0,0,.32);
+    transform:translateX(100%);transition:transform .35s ease;z-index:51;
   }
   .nav__links.open{transform:none}
   .nav__links a{font-size:1.05rem;padding:10px 0}
-  .nav__burger{display:flex;z-index:49}
+  .nav__burger{display:flex;z-index:52}
   .nav__burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
   .nav__burger.open span:nth-child(2){opacity:0}
   .nav__burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
@@ -385,7 +395,12 @@ img{max-width:100%;display:block}
 @media(max-width:560px){
   .section{padding:76px 0}
   .hero__stats{grid-template-columns:1fr 1fr;gap:12px}
-  .flow__arrow{transform:rotate(90deg)}
+  .flow{flex-direction:column;align-items:stretch;gap:12px}
+  .flow__step{flex:0 0 auto;max-width:none;width:100%}
+  .flow__arrow{
+    align-self:center;justify-content:center;height:24px;line-height:1;
+    transform:rotate(90deg);
+  }
   .tests{grid-template-columns:1fr}
   .gallery{grid-template-columns:1fr}
   .gallery__item--big{grid-column:auto}
